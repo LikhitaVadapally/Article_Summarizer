@@ -9,7 +9,7 @@ def fetch_three_articles(query: str):
     """
     Returns exactly three items with {title, url, content} using Tavily.
     """
-    resp = _tavily.search(query=query, max_results=3)
+    resp = _tavily.search(query=query, max_results=3, search_depth="basic")
     items = []
     for r in resp.get("results", [])[:3]:
         items.append({
@@ -17,5 +17,5 @@ def fetch_three_articles(query: str):
             "url": r.get("url", ""),
             "content": r.get("content", ""),
         })
-    # If Tavily returns fewer than 3, just return what we have (simple v1 behavior)
+    
     return items
