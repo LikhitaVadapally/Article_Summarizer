@@ -22,7 +22,7 @@ def node_fetch_3(state: AgentState) -> AgentState:
 def _build_context_block(articles: List[Article]) -> str:
     blocks = []
     for i, a in enumerate(articles, 1):
-        content = (a.get("content") or "")[:6000]
+        content = (a.get("content") or "")[:4000]
         blocks.append(f"[{i}] Title: {a.get('title','')}\nURL: {a.get('url','')}\n\n{content}\n")
     return "\n\n".join(blocks)
 
