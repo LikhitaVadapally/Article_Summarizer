@@ -1,5 +1,5 @@
-#Web Article Summarizer 🧠
-##A simple LLM agent that:
+# Web Article Summarizer 🧠
+## A simple LLM agent that:
 
 Takes a user’s topic from a Streamlit chat interface
 
@@ -13,7 +13,7 @@ Built with LangGraph, LangChain, Streamlit, and Tavily.
 
 
 
-#📂 Project Structure
+# 📂 Project Structure
 llm_agent/
 ├─ app.py                  # Streamlit entry point (UI + workflow)
 
@@ -35,32 +35,31 @@ llm_agent/
 
 └─ README.md               
 
-#⚙️ Installation
+# ⚙️ Installation
 
-##1. Clone the repo:
+## 1. Clone the repo:
 
 git clone https://github.com/your-username/llm_agent.git
 cd llm_agent
 
 
-##2. Create and activate a virtual environment:
+## 2. Create and activate a virtual environment:
 
 python -m venv .venv
 .venv\Scripts\activate   # On Windows (PowerShell)
 source .venv/bin/activate # On Mac/Linux
 
 
-##3. Install dependencies:
+## 3. Install dependencies:
 
 pip install -r requirements.txt
 
 
-##4. Set up .env:
+## 4. Set up .env:
 
 cp .env.example .env
 
-
-###Fill in:
+### Fill in:
 
 OPENAI_API_KEY=sk-... (if using OpenAI)
 
@@ -68,7 +67,7 @@ TAVILY_API_KEY=tvly-...
 
 Defaults like DEFAULT_PROVIDER=ollama
 
-##5. If using Ollama locally:
+## 5. If using Ollama locally:
 
 Install Ollama
 
@@ -76,13 +75,13 @@ Pull a model:
 
 ollama pull llama3.2:3b
 
-#▶️ Running the App
+# ▶️ Running the App
 
-##Start the Streamlit app:
+## Start the Streamlit app:
 
 streamlit run app.py
 
 
-##You’ll see:
+## You’ll see:
 
 Local URL: http://localhost:8501
