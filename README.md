@@ -17,17 +17,14 @@ Built with LangGraph, LangChain, Streamlit, and Tavily.
 llm_agent/
 ├─ app.py                  # Streamlit entry point (UI + workflow)
 
-├─ graph/
-│  └─ agent_graph.py       # LangGraph definition (fetch → summarize)
+├─ graph/agent_graph.py       # LangGraph definition (fetch → summarize)
 
-├─ llm/
-│  └─ model_factory.py     # Model provider factory (OpenAI vs Ollama)
 
-├─ retrieval/
-│  └─ web_search.py        # Tavily API search wrapper
+├─ llm/model_factory.py     # Model provider factory (OpenAI vs Ollama)
 
-├─ prompts/
-│  └─ synthesis_prompt.txt # Instructions for summarization
+├─ retrieval/web_search.py        # Tavily API search wrapper
+
+├─ prompts/synthesis_prompt.txt # Instructions for summarization
 
 ├─ requirements.txt        # Python dependencies
 
