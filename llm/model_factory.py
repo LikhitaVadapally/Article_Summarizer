@@ -21,6 +21,7 @@ def get_chat_model(
         return ChatOpenAI(model=model, temperature=temperature)
     elif provider == "ollama":
         model = model_name or os.getenv("DEFAULT_OLLAMA_MODEL", "llama3.2:3b")
-        return ChatOllama(model=model, temperature=temperature)
+        return ChatOllama(model=model, temperature=temperature, model_kwargs={"num_ctx": 2500})
+    #default might be 4096 tokens or more
     else:
         raise ValueError(f"Unknown provider: {provider}")
