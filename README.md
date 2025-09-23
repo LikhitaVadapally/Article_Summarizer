@@ -3,18 +3,19 @@
 
 Takes a user’s topic from a Streamlit chat interface
 
-Fetches 3 relevant articles via the Tavily API
+- Fetches 3 relevant articles via the Tavily API
 
-Summarizes them into a concise, grounded answer with citations
+- Summarizes them into a concise, grounded answer with citations
 
-Runs on either OpenAI models or local Ollama models (swap with one click)
+- Runs on either OpenAI models or local Ollama models (swap with one click)
 
-Built with LangGraph, LangChain, Streamlit, and Tavily.
+- Built with LangGraph, LangChain, Streamlit, and Tavily.
 
 
 
 # 📂 Project Structure
 llm_agent/
+
 ├─ app.py                  # Streamlit entry point (UI + workflow)
 
 ├─ graph/agent_graph.py       # LangGraph definition (fetch → summarize)
@@ -36,14 +37,16 @@ llm_agent/
 
 ## 1. Clone the repo:
 
-git clone https://github.com/your-username/llm_agent.git
+git clone https://github.com/LikhitaVadapally/llm_agent.git
 cd llm_agent
 
 
 ## 2. Create and activate a virtual environment:
 
 python -m venv .venv
+
 .venv\Scripts\activate   # On Windows (PowerShell)
+
 source .venv/bin/activate # On Mac/Linux
 
 
