@@ -1,0 +1,4 @@
+2025-09-23 10:50:07,127 - ERROR - Tavily search failed for query='latest covid cases in india': The provided API key is invalid.
+2025-09-23 10:55:40,706 - INFO - Tavily query='latest covid cases in india' returned 3 results.
+2025-09-23 10:55:46,361 - INFO - Tavily query='latest covid cases in india' returned 3 results.
+2025-09-23 10:57:15,819 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
