@@ -48,7 +48,7 @@ user_topic = st.chat_input("Give me a topic (e.g., 'LLM agents vs. traditional R
 def run_graph_with_articles(question: str, provider: str, model_name: str, temperature: float, articles: list):
     """
     Runs the LangGraph using pre-fetched articles.
-    If your graph's fetch node ignores pre-filled articles, it may fetch again,
+    If the graph's fetch node ignores pre-filled articles, it may fetch again,
     but passing them lets you also display sources immediately in the UI.
     """
     chat_model = get_chat_model(provider, model_name, temperature)
