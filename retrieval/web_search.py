@@ -1,5 +1,7 @@
 import os
 import logging
+import time
+from typing import Dict, List, Optional
 from dotenv import load_dotenv
 from tavily import TavilyClient
 
@@ -13,7 +15,7 @@ logging.basicConfig(
 )
 
 API_KEY = os.getenv("TAVILY_API_KEY", "")
-_tavily = None
+_tavily: Optional[TavilyClient] = None
 
 if API_KEY:
     try:
@@ -23,28 +25,39 @@ if API_KEY:
 else:
     logging.warning("TAVILY_API_KEY not set; Tavily search disabled.")
 
+def _retry(n=3, base=0.4):
+    """Simple exponential backoff decorator."""
+    def deco(fn):
+        def wrap(*a, **k):
+            last = None
+            for i in range(n):
+                try:
+                    return fn(*a, **k)
+                except Exception as e:
+                    last = e
+                    logging.warning(f"{fn.__name__} failed (attempt {i+1}/{n}): {e}")
+                    time.sleep(base * (2 ** i))
+            logging.error(f"{fn.__name__} exhausted retries: {last}")
+            return []
+        return wrap
+    return deco
 
-def fetch_three_articles(query: str):
+@_retry(n=3, base=0.4)
+def fetch_articles(query: str, k: int = 3) -> List[Dict]:
     """
-    Returns up to three items with {title, url, content} using Tavily.
-    Adds basic error handling so failures don't crash the app.
+    Search provider → returns up to k items with {title, url, content}.
     """
     if not _tavily:
         logging.warning("Tavily client unavailable; returning empty list.")
         return []
 
-    try:
-        resp = _tavily.search(query=query, max_results=3, search_depth="basic")
-        results = resp.get("results", []) if isinstance(resp, dict) else []
-        items = [{
-            "title": r.get("title", ""),
-            "url": r.get("url", ""),
-            "content": r.get("content", ""),
-        } for r in results[:3]]
+    resp = _tavily.search(query=query, max_results=k, search_depth="basic")
+    results = resp.get("results", []) if isinstance(resp, dict) else []
+    items = [{
+        "title": r.get("title", "") or "",
+        "url": r.get("url", "") or "",
+        "content": r.get("content", "") or "",  
+    } for r in results[:k]]
 
-        logging.info(f"Tavily query='{query}' returned {len(items)} results.")
-        return items
-
-    except Exception as e:
-        logging.error(f"Tavily search failed for query='{query}': {e}")
-        return []
+    logging.info(f"Tavily query='{query}' returned {len(items)} result(s).")
+    return items
