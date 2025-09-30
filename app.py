@@ -3,14 +3,13 @@ import asyncio
 import time
 import streamlit as st
 from dotenv import load_dotenv
-from graph.agent_graph import build_agent 
-from llm.model_factory import get_chat_model  
+from graph.agent_graph import build_agent  # Adjust path if needed (e.g., from agent_graph)
 
 load_dotenv()
 
 # Robust path to the prompt file
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-PROMPT_PATH = os.path.join(BASE_DIR, "prompts", "synthesis_prompt.txt") 
+PROMPT_PATH = os.path.join(BASE_DIR, "prompts", "synthesis_prompt.txt")  # Assumes 'prompts/' dir; adjust if flat
 with open(PROMPT_PATH, "r", encoding="utf-8") as f:
     SYNTHESIS_PROMPT = f.read()
 
@@ -51,7 +50,7 @@ for m in st.session_state.messages:
                         st.markdown(f"### {i}. {summary.get('title', f'Source {i}')}")
                         if summary.get('url'):
                             st.markdown(f"[Source URL]({summary['url']})")
-                        st.markdown(f"**Relevance Score:** {summary.get('relevance_score', 'N/A'):.2f}")
+                        # Relevance Score removed
                         st.markdown(f"**Summary:** {summary.get('summary', 'No summary available')}")
                         st.markdown("---")
 
@@ -84,12 +83,11 @@ if user_topic:
                     title = summary.title.strip()
                     url = summary.url.strip()
                     summary_text = summary.summary.strip()
-                    relevance_score = summary.relevance_score
                     
                     part = f"### {i}. {title}\n\n"
                     if url:
                         part += f"[Source URL]({url})\n\n"
-                    part += f"**Relevance Score:** {relevance_score:.2f}\n\n"
+                    # Relevance Score removed
                     part += f"**Summary:** {summary_text}\n\n"
                     part += "---\n\n"
                     content_parts.append(part)
@@ -97,13 +95,12 @@ if user_topic:
                 full_content = "".join(content_parts)
                 st.markdown(full_content)
 
-                # Store summaries for chat history
+                # Store summaries for chat history (no relevance_score)
                 source_data = [
                     {
                         "title": summary.title,
                         "url": summary.url,
-                        "summary": summary.summary,
-                        "relevance_score": summary.relevance_score
+                        "summary": summary.summary
                     }
                     for summary in response.summaries
                 ]
