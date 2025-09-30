@@ -53,7 +53,7 @@ def fetch_articles(query: str, k: int = 3) -> List[Dict]:
         logging.warning("Tavily client unavailable: check if API key is set correctly.")
         return []
 
-    resp = _tavily.search(query=query, max_results=k, search_depth="basic")
+    resp = _tavily.search(query=query, max_results=k, search_depth="basic", use_cache=True)
     results = resp.get("results", []) if isinstance(resp, dict) else []
     items = [{
         "title": r.get("title", "") or "",
