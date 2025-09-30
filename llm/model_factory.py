@@ -25,6 +25,6 @@ def get_chat_model(
 
     if provider == "ollama":
         model = model_name or os.getenv("DEFAULT_OLLAMA_MODEL", "llama3.2:1b")
-        return ChatOllama(model=model, temperature=temperature, model_kwargs={"num_ctx": 2000})
+        return ChatOllama(model=model, temperature=temperature, model_kwargs={"num_ctx": 4096})
 
     raise ValueError(f"Unknown provider: {provider}")
