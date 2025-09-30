@@ -8,8 +8,9 @@ from tavily import TavilyClient
 load_dotenv()
 
 # logging setup
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  
 logging.basicConfig(
-    filename="summarizer.log",
+    filename=os.path.join(BASE_DIR, "summarizer.log"),
     level=logging.INFO,
     format="%(asctime)s - %(levelname)s - %(message)s"
 )
@@ -45,10 +46,11 @@ def _retry(n=3, base=0.4):
 @_retry(n=3, base=0.4)
 def fetch_articles(query: str, k: int = 3) -> List[Dict]:
     """
-    Search provider → returns up to k items with {title, url, content}.
+    Search provider returns up to k items with {title, url, content}.
+    Always returns a list, logs warnings when unavailable.
     """
     if not _tavily:
-        logging.warning("Tavily client unavailable; returning empty list.")
+        logging.warning("Tavily client unavailable: check if API key is set correctly.")
         return []
 
     resp = _tavily.search(query=query, max_results=k, search_depth="basic")
@@ -56,7 +58,7 @@ def fetch_articles(query: str, k: int = 3) -> List[Dict]:
     items = [{
         "title": r.get("title", "") or "",
         "url": r.get("url", "") or "",
-        "content": r.get("content", "") or "",  
+        "content": r.get("content", "") or "",
     } for r in results[:k]]
 
     logging.info(f"Tavily query='{query}' returned {len(items)} result(s).")
