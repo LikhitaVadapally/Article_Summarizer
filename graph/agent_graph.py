@@ -1,3 +1,4 @@
+
 import re
 import json
 import logging
@@ -10,7 +11,7 @@ from langchain_ollama import ChatOllama
 from retrieval.web_search import fetch_articles  
 from llm.model_factory import get_chat_model  
 
-# Setup basic logging if not already (shared with web_search.py)
+# Setup basic logging if not already )
 logging.basicConfig(level=logging.INFO)
 
 class ArticleSummary(BaseModel):
@@ -18,7 +19,7 @@ class ArticleSummary(BaseModel):
     title: str = Field(description="The title of the article")
     url: str = Field(description="The URL of the article")
     summary: str = Field(description="The summary of the article content")
-    # article_relevance_score: float = Field(default=-1.0, description="Relevance of article to query (0.0–1.0)")  # Commented out: Removed article relevance scoring
+    # article_relevance_score: float = Field(default=-1.0, description="Relevance of article to query (0.0–1.0)") 
     summary_relevance_score: float = Field(default=-1.0, description="Faithfulness of summary to article (0.0–1.0)")
 
 class ResponseFormatter(BaseModel):
@@ -45,10 +46,21 @@ def build_agent(provider: str, model_name: str, temperature: float, synthesis_pr
     def web_search(query: str, k: int = 3) -> List[Dict[str, str]]:
         """Search the web and return up to k articles with title, url, and content."""
         items = fetch_articles(query, k=k) or []
-        return [
+
+        # DEBUG LOGGING
+        logging.info(f"DEBUG: Query '{query}' - Raw items count: {len(items)}")
+        for idx, i in enumerate(items):
+            logging.info(f"  Item {idx}: type='{i.get('type', 'MISSING')}', url='{i.get('url', 'MISSING')[:50]}...', title='{i.get('title', 'MISSING')[:50]}...'")
+
+        article_types = {"article"}
+        filtered = [
             {"title": i.get("title", ""), "url": i.get("url", ""), "content": i.get("content", "")}
-            for i in items if i.get("url")
-        ]
+            #for i in items if i.get("url")
+            for i in items if i.get("type") in article_types and i.get("url")
+        ] 
+        logging.info(f"DEBUG: After filter - {len(filtered)} items matched types {article_types}")
+        return filtered[:k]
+
 
     @tool
     def evaluate_relevance(mode: str, text1: str, text2: str) -> Dict[str, Any]:
@@ -59,22 +71,18 @@ def build_agent(provider: str, model_name: str, temperature: float, synthesis_pr
         prompt = (
             f"You are a JSON expert. Output ONLY valid JSON: {{\"score\": <float 0.0-1.0>, \"rationale\": \"<brief explanation>\"}}\n"
             f"Mode: summary_to_article\n"
-            f"Text1 (source content): {text1[:2000]}\n"  # Increase to 2000; add "source" not "article"
+            f"Text1 (source content): {text1[:2000]}\n"  # Source article content
             f"Text2 (summary): {text2[:2000]}\n"
-            "Score how well the summary captures key facts from the source (even if it's a video description, snippet, or short text). "
-            "High score (0.8+) if facts/numbers match without hallucination. Default to 0.6+ for partial matches."
+            "Score how well the summary captures key facts from the source. "
+            "High score (0.8+) if facts/numbers match without hallucination. Default to 0.6+ for partial matches. "
             "Ensure keys/values are double-quoted. No extra text."
-            )
+        )
         
-# In fallback/validate: Change default to 0.6 if rationale mentions "video" or "description"
-        if "video" in rationale.lower() or "description" in rationale.lower():
-            score = max(score, 0.6)  # Leniency for media
-            
         try:
             response = chat_model.invoke([HumanMessage(content=prompt)])
             raw_output = response.content.strip()
             logging.info(f"Raw eval output for '{text1[:50]}...': {raw_output[:200]}...")  # Debug log
-            # Try json.loads
+            # Parse JSON
             result = json.loads(raw_output)
             score = float(result.get('score', 0.0))
             rationale = result.get('rationale', 'No rationale')
@@ -93,7 +101,7 @@ def build_agent(provider: str, model_name: str, temperature: float, synthesis_pr
                 rationale = rationale_match.group(1) if rationale_match else f"Parse error: {str(e)[:100]}"
                 logging.warning(f"JSON fallback used: score={score}, rationale={rationale}")
                 return {"score": score, "rationale": rationale}
-            except:
+            except Exception as e:
                 return {"score": 0.5, "rationale": f"Regex fallback failed: {str(e)[:100]}"}
         except Exception as e:
             logging.error(f"Relevance evaluation failed: {e}")
@@ -221,7 +229,7 @@ def build_agent(provider: str, model_name: str, temperature: float, synthesis_pr
                                 title=summary_dict["title"],
                                 url=summary_dict["url"],
                                 summary=summary_dict["summary"],
-                                # article_relevance_score=article.get("relevance_score", -1.0),  # Commented out
+                                # article_relevance_score=article.get("relevance_score", -1.0), 
                                 summary_relevance_score=summary_relevance
                             ))
                             logging.info(f"Summarized article: {summary_dict['title'][:50]}...")
@@ -238,7 +246,7 @@ def build_agent(provider: str, model_name: str, temperature: float, synthesis_pr
                             title=article.get("title", "Error"),
                             url=article.get("url", ""),
                             summary=f"Failed to summarize: {str(sum_err)[:100]}",
-                            # article_relevance_score=article.get("relevance_score", -1.0),  # Commented out
+                            # article_relevance_score=article.get("relevance_score", -1.0),
                             summary_relevance_score=0.0
                         ))
 
@@ -248,7 +256,7 @@ def build_agent(provider: str, model_name: str, temperature: float, synthesis_pr
                 title="No additional article found",
                 url="",
                 summary="Unable to find a relevant article after multiple searches.",
-                # article_relevance_score=0.0,  # Commented out
+                # article_relevance_score=0.0,
                 summary_relevance_score=0.0
             ))
 
